@@ -213,34 +213,33 @@
     let isPlaying = false;
 
     // 🌟 網頁一載入，立刻啟動 LIFF 魔法！
-    window.onload = async () => {
+   window.onload = async () => {
       try {
-        // 先把基本畫面渲染好
+        await liff.init({ liffId: MY_LIFF_ID });
+        
+        // 🌟 新增：如果沒登入，就立刻彈出 LINE 登入畫面
+        if (!liff.isLoggedIn()) {
+          liff.login(); 
+          return;
+        }
+
+        // 登入後抓資料
+        userProfile = await liff.getProfile();
+        document.getElementById('userNameDisplay').innerText = userProfile.displayName;
+        if (userProfile.pictureUrl) {
+          document.getElementById('userAvatarDisplay').src = userProfile.pictureUrl;
+          document.getElementById('userAvatarDisplay').classList.remove('hidden');
+        }
+
+        // 渲染畫面
         document.getElementById('promoBannerImg').src = DATABASE.banner.image;
         document.getElementById('promoBannerTag').innerText = DATABASE.banner.tag;
         document.getElementById('promoBannerTitle').innerText = DATABASE.banner.title;
         renderList(DATABASE.companions);
         
-        // 啟動 LIFF
-        await liff.init({ liffId: MY_LIFF_ID });
-        
-        // 檢查客人是不是從 LINE 裡面打開的
-        if (liff.isLoggedIn()) {
-          userProfile = await liff.getProfile();
-          // 把大頭貼跟名字顯示在首頁右上角
-          document.getElementById('userNameDisplay').innerText = userProfile.displayName;
-          if (userProfile.pictureUrl) {
-            document.getElementById('userAvatarDisplay').src = userProfile.pictureUrl;
-            document.getElementById('userAvatarDisplay').classList.remove('hidden');
-          }
-        } else {
-          // 如果沒有登入 (例如用電腦瀏覽器開啟)，可選：強迫登入 liff.login();
-          document.getElementById('userNameDisplay').innerText = "外部瀏覽";
-        }
       } catch (err) {
-        console.error("LIFF 啟動失敗:", err);
+        console.error("LIFF 初始化失敗:", err);
       } finally {
-        // 關閉轉圈圈載入畫面
         document.getElementById('loadingOverlay').classList.add('opacity-0', 'pointer-events-none');
       }
     };
