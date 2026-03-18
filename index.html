@@ -423,7 +423,7 @@
 
     // 🌟 全新送出訂單邏輯：透過 LINE 自動發送文字給客服
 async function submitOrder() {
-      // 1. 抓取表單資料
+      // 1. 抓取資料
       const discordId = document.getElementById('discordId').value;
       const memo = document.getElementById('memo').value || "無備註";
       const companionName = document.getElementById('headerName').innerText;
@@ -439,88 +439,38 @@ async function submitOrder() {
       if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
 
       const btn = document.getElementById('submitBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 產生明細中...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 傳送中...';
       btn.disabled = true;
 
-      // 🌟 2. 這是取消頭像後的簡約版 Flex Message 結構
+      // 🌟 2. 極簡安全版 Flex (確保不會報 400 錯誤)
       const flexData = {
         type: "bubble",
-        header: {
-          type: "box",
-          layout: "vertical",
-          contents: [
-            { type: "text", text: "九霄劍閣・服務預約", color: "#ffffff", weight: "bold", size: "sm", letterSpacing: "2px" }
-          ],
-          backgroundColor: "#6366f1",
-          paddingAll: "12px",
-          paddingStart: "20px"
-        },
         body: {
           type: "box",
           layout: "vertical",
           backgroundColor: "#111827",
-          paddingAll: "20px",
           contents: [
+            { type: "text", text: "九霄劍閣 - 預約需求", weight: "bold", color: "#6366f1", size: "sm" },
+            { type: "text", text: companionName, weight: "bold", size: "xl", color: "#ffffff", margin: "md" },
+            { type: "separator", margin: "md", color: "#333333" },
             {
               type: "box",
               layout: "vertical",
-              contents: [
-                { type: "text", text: companionName, weight: "bold", size: "xl", color: "#ffffff" },
-                { type: "text", text: "已收到您的預約申請，請確認以下資訊", size: "xs", color: "#6366f1", margin: "xs" }
-              ]
-            },
-            { type: "separator", margin: "lg", color: "#333333" },
-            {
-              type: "box",
-              layout: "vertical",
-              margin: "lg",
+              margin: "md",
               spacing: "sm",
               contents: [
-                {
-                  type: "box", layout: "horizontal", contents: [
-                    { type: "text", text: "預約項目", color: "#9ca3af", size: "xs", flex: 2 },
-                    { type: "text", text: `${serviceName} x ${qty}${unit}`, color: "#ffffff", size: "xs", align: "end", flex: 4 }
-                  ]
-                },
-                {
-                  type: "box", layout: "horizontal", contents: [
-                    { type: "text", text: "Discord", color: "#9ca3af", size: "xs", flex: 2 },
-                    { type: "text", text: discordId, color: "#ffffff", size: "xs", align: "end", weight: "bold", flex: 4 }
-                  ]
-                },
-                {
-                  type: "box", layout: "horizontal", contents: [
-                    { type: "text", text: "備註內容", color: "#9ca3af", size: "xs", flex: 2 },
-                    { type: "text", text: memo, color: "#ffffff", size: "xs", align: "end", wrap: true, flex: 4 }
-                  ]
-                }
+                { type: "text", text: `項目：${serviceName} x ${qty}${unit}`, color: "#aaaaaa", size: "xs" },
+                { type: "text", text: `Discord：${discordId}`, color: "#aaaaaa", size: "xs" },
+                { type: "text", text: `備註：${memo}`, color: "#aaaaaa", size: "xs", wrap: true }
               ]
             },
             {
               type: "box",
               layout: "horizontal",
-              margin: "xl",
+              margin: "lg",
               contents: [
                 { type: "text", text: "應付金額", color: "#ffffff", size: "sm", gravity: "bottom" },
-                { type: "text", text: `NT$ ${total}`, color: "#f472b6", size: "xxl", align: "end", weight: "bold" }
-              ]
-            }
-          ]
-        },
-        footer: {
-          type: "box",
-          layout: "vertical",
-          backgroundColor: "#111827",
-          paddingAll: "15px",
-          contents: [
-            {
-              type: "box",
-              layout: "vertical",
-              backgroundColor: "#1f2937",
-              paddingAll: "8px",
-              cornerRadius: "md",
-              contents: [
-                { type: "text", text: "⚠️ 請保持 LINE 開啟，客服將盡快聯繫", color: "#9ca3af", size: "xxs", align: "center" }
+                { type: "text", text: `NT$ ${total}`, color: "#f472b6", size: "xl", align: "end", weight: "bold" }
               ]
             }
           ]
@@ -529,24 +479,21 @@ async function submitOrder() {
 
       try {
         if (liff.isLoggedIn()) {
-          // 🌟 3. 發送 Flex 卡片
+          // 🌟 3. 發送
           await liff.sendMessages([{
             type: "flex",
             altText: `【九霄劍閣】預約單 - ${companionName}`,
             contents: flexData
           }]);
           
-          showToast("✅ 預約卡片已傳送！");
-          // 發送成功後，自動關閉網頁視窗
+          showToast("✅ 預約已傳送！");
           setTimeout(() => { liff.closeWindow(); }, 1200);
         } else {
-          window.location.href = LINE_OFFICIAL_URL;
+          liff.login();
         }
       } catch (error) {
-        console.error("發送失敗:", error);
-        // 如果依然失敗，彈出具體錯誤原因方便檢查
-        alert("發送失敗原因：" + JSON.stringify(error));
-        showToast("發送失敗，請聯繫客服", true);
+        // 如果還是失敗，會彈出原因
+        alert("發送失敗：" + JSON.stringify(error));
         window.location.href = LINE_OFFICIAL_URL;
       } finally {
         btn.innerHTML = '確認送出訂單';
