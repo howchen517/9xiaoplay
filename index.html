@@ -423,12 +423,17 @@
 
     // 🌟 全新送出訂單邏輯：透過 LINE 自動發送文字給客服
 async function submitOrder() {
-      // 1. 抓取資料
+      // 1. 抓取表單資料
       const discordId = document.getElementById('discordId').value;
       const memo = document.getElementById('memo').value || "無備註";
-      const companionName = document.getElementById('headerName').innerText;
-      const serviceSelect = document.getElementById('serviceSelect');
+      const headerEl = document.getElementById('headerName');
+      const companionName = headerEl ? headerEl.innerText : "未知名導師";
       
+      // 🌟 從資料庫中找出該導師的編號
+      const companionData = DATABASE.companions.find(c => c.name === companionName);
+      const companionId = companionData ? companionData.id : "00";
+      
+      const serviceSelect = document.getElementById('serviceSelect');
       if(!serviceSelect.options.length) return showToast("請選擇服務", true);
       
       const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text.split(' (')[0];
@@ -439,80 +444,98 @@ async function submitOrder() {
       if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
 
       const btn = document.getElementById('submitBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 傳送中...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 處理中...';
       btn.disabled = true;
 
-      // 🌟 2. 你最喜歡的「藍色填滿標題」穩健版 Flex
+      // 🌟 2. 九霄劍閣・奢華電競版 Flex (含編號與名字)
       const flexData = {
         type: "bubble",
         header: {
           type: "box",
           layout: "vertical",
           contents: [
-            {
-              type: "text",
-              text: "🎮 九霄劍閣 - 預約需求",
-              color: "#ffffff",
-              weight: "bold",
-              size: "md"
-            }
+            { type: "text", text: "九霄劍閣・PREMIUM", color: "#ffffff", weight: "bold", size: "xxs", letterSpacing: "4px" },
+            { type: "text", text: "服務預約確認單", color: "#ffffff", weight: "bold", size: "lg", margin: "sm" }
           ],
-          backgroundColor: "#4F46E5", // 漂亮的靛藍色背景
-          paddingAll: "15px"
+          backgroundColor: "#4F46E5",
+          paddingAll: "20px"
         },
         body: {
           type: "box",
           layout: "vertical",
-          backgroundColor: "#111827",
+          backgroundColor: "#0F172A",
           paddingAll: "20px",
           contents: [
             {
-              type: "text",
-              text: `預約導師：${companionName}`,
-              weight: "bold",
-              size: "md",
-              color: "#ffffff"
+              type: "box",
+              layout: "vertical",
+              contents: [
+                {
+                  type: "text",
+                  text: `NO.${companionId} ｜ ${companionName}`,
+                  weight: "bold",
+                  size: "xl",
+                  color: "#ffffff"
+                },
+                {
+                  type: "text",
+                  text: "已收到預約申請，請確認以下資訊",
+                  size: "xs",
+                  color: "#818CF8",
+                  margin: "xs"
+                }
+              ]
             },
-            {
-              type: "text",
-              text: `服務內容：${serviceName} x ${qty} ${unit}`,
-              size: "xs",
-              color: "#aaaaaa",
-              margin: "sm"
-            },
-            {
-              type: "text",
-              text: `應付金額：NT$ ${total}`,
-              size: "xl",
-              color: "#818CF8",
-              weight: "bold",
-              margin: "md"
-            },
-            {
-              type: "separator",
-              margin: "lg",
-              color: "#333333"
-            },
+            { type: "separator", margin: "lg", color: "#334155" },
             {
               type: "box",
               layout: "vertical",
               margin: "lg",
-              spacing: "xs",
+              spacing: "sm",
               contents: [
                 {
-                  type: "text",
-                  text: `Discord：${discordId}`,
-                  color: "#dddddd",
-                  size: "xs"
+                  type: "box", layout: "horizontal", contents: [
+                    { type: "text", text: "預約項目", color: "#64748B", size: "xs", flex: 2 },
+                    { type: "text", text: `${serviceName} x ${qty} ${unit}`, color: "#F1F5F9", size: "xs", align: "end", flex: 4 }
+                  ]
                 },
                 {
-                  type: "text",
-                  text: `備註：${memo}`,
-                  color: "#999999",
-                  size: "xs",
-                  wrap: true
+                  type: "box", layout: "horizontal", contents: [
+                    { type: "text", text: "Discord ID", color: "#64748B", size: "xs", flex: 2 },
+                    { type: "text", text: discordId, color: "#F1F5F9", size: "xs", align: "end", weight: "bold", flex: 4 }
+                  ]
+                },
+                {
+                  type: "box", layout: "horizontal", contents: [
+                    { type: "text", text: "備註內容", color: "#64748B", size: "xs", flex: 2 },
+                    { type: "text", text: memo, color: "#F1F5F9", size: "xs", align: "end", wrap: true, flex: 4 }
+                  ]
                 }
               ]
+            },
+            {
+              type: "box",
+              layout: "horizontal",
+              margin: "xl",
+              contents: [
+                { type: "text", text: "TOTAL", color: "#818CF8", size: "sm", weight: "bold", gravity: "bottom" },
+                { type: "text", text: `NT$ ${total}`, color: "#F472B6", size: "xxl", align: "end", weight: "bold" }
+              ]
+            }
+          ]
+        },
+        footer: {
+          type: "box",
+          layout: "vertical",
+          backgroundColor: "#0F172A",
+          paddingAll: "15px",
+          contents: [
+            {
+              type: "text",
+              text: "請保持手機通暢，客服將盡快聯繫您",
+              size: "xxs",
+              color: "#475569",
+              align: "center"
             }
           ]
         }
@@ -520,7 +543,6 @@ async function submitOrder() {
 
       try {
         if (liff.isLoggedIn()) {
-          // 🌟 3. 正式發送
           await liff.sendMessages([{
             type: "flex",
             altText: `【九霄劍閣】預約單 - ${companionName}`,
@@ -533,8 +555,8 @@ async function submitOrder() {
           liff.login();
         }
       } catch (error) {
-        // 如果依然失敗，彈出具體原因
-        alert("發送失敗原因：" + JSON.stringify(error));
+        console.error("發送失敗:", error);
+        alert("發送失敗，請確保在 LINE 內開啟並已授權傳訊權限。");
         window.location.href = LINE_OFFICIAL_URL;
       } finally {
         btn.innerHTML = '確認送出訂單';
