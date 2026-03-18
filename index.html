@@ -423,59 +423,68 @@
     }
 
     // 🌟 全新送出訂單邏輯：透過 LINE 自動發送文字給客服
-    async function submitOrder() {
+async function submitOrder() {
+      // 1. 抓取表單資料
       const discordId = document.getElementById('discordId').value;
-      if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
-      
-      const btn = document.getElementById('submitBtn');
-      const ogHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 處理中...'; btn.disabled = true;
-
-      // 1. 整理要發送的訂單文字
-      const companionName = document.getElementById('headerName').innerText;
+      const memo = document.getElementById('memo').value || "無";
+      const headerEl = document.getElementById('headerName');
+      const companionName = headerEl ? headerEl.innerText : "未知名導師";
       const serviceSelect = document.getElementById('serviceSelect');
+      
+      if(!serviceSelect || !serviceSelect.options.length) {
+        return showToast("尚未選擇服務項目！", true);
+      }
+      
       const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text.split(' (')[0];
       const qty = document.getElementById('quantityDisplay').innerText;
       const unit = document.getElementById('unitDisplay').innerText;
       const total = document.getElementById('totalPrice').innerText;
-      const memo = document.getElementById('memo').value || "無";
-      const promoText = document.getElementById('promoCode').value ? `(已套用代碼: ${document.getElementById('promoCode').value})` : "";
-      
-      // 組合超美觀的訂單訊息
-      const orderMessage = `【九霄劍閣 - 預約單】\n\n🌸 導師：${companionName}\n🎮 服務：${serviceName} x ${qty}${unit}\n💰 總計：NT$ ${total} ${promoText}\n💬 Discord ID：${discordId}\n📝 備註：${memo}`;
+      const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
+      const promoInfo = promoCode ? `(使用優惠碼: ${promoCode})` : "";
+
+      if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
+
+      // 🌟 這裡就是你要發送給官方 LINE 客服看到的「預約單文字」
+      const orderMessage = `【九霄劍閣 - 預約訂單】\n` +
+                           `----------------------\n` +
+                           `👤 預約導師：${companionName}\n` +
+                           `🎮 服務項目：${serviceName}\n` +
+                           `🔢 購買數量：${qty} ${unit}\n` +
+                           `💰 總計金額：NT$ ${total} ${promoInfo}\n` +
+                           `🆔 Discord：${discordId}\n` +
+                           `📝 備註事項：${memo}\n` +
+                           `----------------------\n` +
+                           `請稍候，客服將盡快為您安排！`;
+
+      const btn = document.getElementById('submitBtn');
+      const ogHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 發送中...';
+      btn.disabled = true;
 
       try {
-        // 2. 判斷客人是否在 LINE 裡面操作
-        if (liff.isLoggedIn() && liff.isInClient()) {
-          // 直接用客人的帳號發送訊息到你們的官方 LINE！
+        // 🌟 檢查是否在 LINE 環境 (LIFF)
+        if (liff.isInClient()) {
+          // 直接幫客人發訊息給你的官方帳號
           await liff.sendMessages([{
             type: "text",
             text: orderMessage
           }]);
           
-          showToast("✅ 預約單已發送給客服！即將關閉視窗...");
-          
-          // 3. 發送成功後，自動關閉網頁回到聊天室
-          setTimeout(() => { 
-            closeModal(); 
-            liff.closeWindow(); 
-          }, 2000);
-
+          showToast("✅ 訂單已傳送給客服！");
+          // 發送成功後，1.5 秒自動關閉網頁視窗
+          setTimeout(() => { liff.closeWindow(); }, 1500);
         } else {
-          // 如果客人是用電腦的 Chrome 瀏覽器打開的，沒辦法自動發送
-          // 就退而求其次，顯示成功並引導他跳轉到官方 LINE
-          showToast("✅ 預約已記錄！即將轉接客服人員...");
-          setTimeout(() => { 
-            closeModal(); 
-            window.location.href = LINE_OFFICIAL_URL; 
-          }, 1500);
+          // 如果不在 LINE 內（例如電腦測試），告知客人並導向 LINE
+          alert("電腦版不支援自動發訊，請點擊確定後手動聯繫客服。\n\n預約資訊：\n" + orderMessage);
+          window.location.href = LINE_OFFICIAL_URL;
         }
       } catch (error) {
-        console.error("發送訊息失敗:", error);
-        showToast("⚠️ 發送失敗，即將為您轉接客服...", true);
-        setTimeout(() => { window.location.href = LINE_OFFICIAL_URL; }, 1500);
+        console.error("發送失敗:", error);
+        // 如果自動發訊失敗（通常是 Scopes 沒勾），顯示錯誤並跳轉
+        alert("自動發訊失敗(請檢查Scopes權限)，即將轉接客服。");
+        window.location.href = LINE_OFFICIAL_URL;
       } finally {
-        btn.innerHTML = ogHtml; 
+        btn.innerHTML = ogHtml;
         btn.disabled = false;
       }
     }
