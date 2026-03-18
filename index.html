@@ -423,7 +423,7 @@
 
     // 🌟 全新送出訂單邏輯：透過 LINE 自動發送文字給客服
 async function submitOrder() {
-      // 1. 抓取表單資料
+      // 1. 抓取資料 (這部分與之前相同)
       const discordId = document.getElementById('discordId').value;
       const memo = document.getElementById('memo').value || "無備註";
       const companionName = document.getElementById('headerName').innerText;
@@ -432,101 +432,58 @@ async function submitOrder() {
       const qty = document.getElementById('quantityDisplay').innerText;
       const unit = document.getElementById('unitDisplay').innerText;
       const total = document.getElementById('totalPrice').innerText;
-      const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
-      const promoInfo = promoCode ? `已套用: ${promoCode}` : "未使用";
 
       if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
 
       const btn = document.getElementById('submitBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 產生明細中...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 傳送中...';
       btn.disabled = true;
 
-      // 🌟 2. 定義 Flex Message 的漂亮結構 (JSON)
-      const flexData = {
+      // 🌟 2. 這裡定義 Flex 卡片內容 (JSON)
+      const flexContents = {
         type: "bubble",
-        size: "md",
         header: {
           type: "box",
           layout: "vertical",
-          contents: [
-            { type: "text", text: "九霄劍閣 - 預約成功", color: "#ffffff", weight: "bold", size: "md" }
-          ],
-          backgroundColor: "#4F46E5", // 靛藍色背景
-          paddingAll: "15px"
+          contents: [{ type: "text", text: "🎮 九霄劍閣 - 預約需求", color: "#ffffff", weight: "bold", size: "md" }],
+          backgroundColor: "#4F46E5"
         },
         body: {
           type: "box",
           layout: "vertical",
+          backgroundColor: "#111827",
           contents: [
-            { type: "text", text: "感謝您的預約，客服將盡速聯繫您", size: "xs", color: "#888888", margin: "sm" },
-            { type: "separator", margin: "lg", color: "#333333" },
-            {
-              type: "box",
-              layout: "vertical",
-              margin: "lg",
-              spacing: "sm",
-              contents: [
-                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "導師名稱", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: companionName, size: "sm", color: "#ffffff", flex: 4, align: "end", weight: "bold" } ] },
-                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "服務項目", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: serviceName, size: "sm", color: "#ffffff", flex: 4, align: "end" } ] },
-                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "購買數量", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: `${qty} ${unit}`, size: "sm", color: "#ffffff", flex: 4, align: "end" } ] },
-                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "優惠碼", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: promoInfo, size: "sm", color: "#ffffff", flex: 4, align: "end" } ] }
-              ]
-            },
-            { type: "separator", margin: "lg", color: "#333333" },
-            {
-              type: "box",
-              layout: "horizontal",
-              margin: "lg",
-              contents: [
-                { type: "text", text: "付款金額", size: "sm", color: "#aaaaaa" },
-                { type: "text", text: `NT$ ${total}`, size: "xl", align: "end", weight: "bold", color: "#818CF8" }
-              ]
-            },
-            {
-              type: "box",
-              layout: "vertical",
-              margin: "md",
-              paddingAll: "10px",
-              backgroundColor: "#1F2937",
-              cornerRadius: "md",
-              contents: [
-                { type: "text", text: `Discord: ${discordId}`, size: "xs", color: "#cccccc" },
-                { type: "text", text: `備註: ${memo}`, size: "xs", color: "#999999", margin: "xs", wrap: true }
-              ]
-            }
-          ],
-          backgroundColor: "#111827" // 深灰色背景
-        },
-        footer: {
-          type: "box",
-          layout: "vertical",
-          contents: [
-            { type: "text", text: "請稍候客服人員與您聯繫", size: "xs", color: "#aaaaaa", align: "center" }
-          ],
-          backgroundColor: "#111827"
+            { type: "text", text: `預約導師：${companionName}`, color: "#ffffff", size: "sm", weight: "bold" },
+            { type: "text", text: `服務內容：${serviceName} x ${qty} ${unit}`, color: "#aaaaaa", size: "xs", margin: "md" },
+            { type: "text", text: `應付金額：NT$ ${total}`, color: "#818CF8", size: "lg", weight: "bold", margin: "md" },
+            { type: "separator", margin: "md", color: "#333333" },
+            { type: "text", text: `Discord：${discordId}`, color: "#eeeeee", size: "xs", margin: "md" },
+            { type: "text", text: `備註：${memo}`, color: "#999999", size: "xs", margin: "xs", wrap: true }
+          ]
         }
       };
 
       try {
-        if (liff.isInClient()) {
-          // 🌟 3. 發送 Flex 訊息
+        // 🌟 3. 強制執行 LIFF 發送
+        // 不再做複雜的電腦/手機判斷，直接嘗試發送
+        if (liff.isLoggedIn()) {
           await liff.sendMessages([{
             type: "flex",
-            altText: `【九霄劍閣】您有一張來自 ${companionName} 的預約單`, // 當預覽時顯示的文字
-            contents: flexData
+            altText: `【九霄劍閣】預約單 - ${companionName}`,
+            contents: flexContents
           }]);
           
-          showToast("✅ 預約卡片已傳送！");
-          setTimeout(() => { liff.closeWindow(); }, 1500);
+          showToast("✅ 預約卡片已發送！");
+          // 關鍵動作：發送完立刻關閉視窗，客人就會看到卡片在對話框了
+          setTimeout(() => { liff.closeWindow(); }, 1200);
         } else {
-          // 電腦版或外部瀏覽器則改發純文字
-          const rawText = `【預約單】\n導師: ${companionName}\n服務: ${serviceName}\n金額: NT$ ${total}\nDiscord: ${discordId}`;
-          alert("電腦版不支援發送卡片，請手動告知客服：\n\n" + rawText);
-          window.location.href = LINE_OFFICIAL_URL;
+          // 如果真的沒登入，就引導登入
+          liff.login();
         }
       } catch (error) {
-        console.error("Flex 發送失敗:", error);
-        showToast("發送失敗，請聯繫客服", true);
+        console.error("發送失敗:", error);
+        // 如果報錯（例如在一般瀏覽器開），才跳轉到官方 LINE
+        showToast("環境不支援自動發送，轉接客服中...", true);
         setTimeout(() => { window.location.href = LINE_OFFICIAL_URL; }, 1500);
       } finally {
         btn.innerHTML = '確認送出訂單';
