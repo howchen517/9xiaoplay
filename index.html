@@ -442,7 +442,7 @@ async function submitOrder() {
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 產生明細中...';
       btn.disabled = true;
 
-      // 🌟 2. 這裡就是剛才那串專業版的 Flex Message 結構
+      // 🌟 2. 這是取消頭像後的簡約版 Flex Message 結構
       const flexData = {
         type: "bubble",
         header: {
@@ -463,35 +463,10 @@ async function submitOrder() {
           contents: [
             {
               type: "box",
-              layout: "horizontal",
+              layout: "vertical",
               contents: [
-                {
-                  type: "box",
-                  layout: "vertical",
-                  flex: 1,
-                  contents: [
-                    {
-                      type: "image",
-                      // 自動從資料庫抓取對應導師的頭像
-                      url: DATABASE.companions.find(c => c.name === companionName)?.avatar || "https://via.placeholder.com/150",
-                      size: "full",
-                      aspectMode: "cover",
-                      aspectRatio: "1:1",
-                      cornerRadius: "100px"
-                    }
-                  ],
-                  maxWidth: "60px"
-                },
-                {
-                  type: "box",
-                  layout: "vertical",
-                  flex: 4,
-                  paddingStart: "15px",
-                  contents: [
-                    { type: "text", text: companionName, weight: "bold", size: "lg", color: "#ffffff" },
-                    { type: "text", text: "已收到您的預約申請", size: "xs", color: "#6366f1", margin: "xs" }
-                  ]
-                }
+                { type: "text", text: companionName, weight: "bold", size: "xl", color: "#ffffff" },
+                { type: "text", text: "已收到您的預約申請，請確認以下資訊", size: "xs", color: "#6366f1", margin: "xs" }
               ]
             },
             { type: "separator", margin: "lg", color: "#333333" },
@@ -503,7 +478,7 @@ async function submitOrder() {
               contents: [
                 {
                   type: "box", layout: "horizontal", contents: [
-                    { type: "text", text: "預預項目", color: "#9ca3af", size: "xs", flex: 2 },
+                    { type: "text", text: "預約項目", color: "#9ca3af", size: "xs", flex: 2 },
                     { type: "text", text: `${serviceName} x ${qty}${unit}`, color: "#ffffff", size: "xs", align: "end", flex: 4 }
                   ]
                 },
@@ -554,7 +529,7 @@ async function submitOrder() {
 
       try {
         if (liff.isLoggedIn()) {
-          // 🌟 3. 正式發送升級後的 Flex 卡片
+          // 🌟 3. 發送 Flex 卡片
           await liff.sendMessages([{
             type: "flex",
             altText: `【九霄劍閣】預約單 - ${companionName}`,
@@ -569,6 +544,8 @@ async function submitOrder() {
         }
       } catch (error) {
         console.error("發送失敗:", error);
+        // 如果依然失敗，彈出具體錯誤原因方便檢查
+        alert("發送失敗原因：" + JSON.stringify(error));
         showToast("發送失敗，請聯繫客服", true);
         window.location.href = LINE_OFFICIAL_URL;
       } finally {
