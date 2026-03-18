@@ -429,9 +429,9 @@ async function submitOrder() {
       const headerEl = document.getElementById('headerName');
       const companionName = headerEl ? headerEl.innerText : "未知名導師";
       
-      // 🌟 從資料庫中找出該導師的編號
+      // 🌟 核心修正：從 DATABASE 裡抓出對應名字的 ID
       const companionData = DATABASE.companions.find(c => c.name === companionName);
-      const companionId = companionData ? companionData.id : "00";
+      const companionId = companionData ? companionData.id : "N/A";
       
       const serviceSelect = document.getElementById('serviceSelect');
       if(!serviceSelect.options.length) return showToast("請選擇服務", true);
@@ -447,7 +447,7 @@ async function submitOrder() {
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 處理中...';
       btn.disabled = true;
 
-      // 🌟 2. 九霄劍閣・奢華電競版 Flex (含編號與名字)
+      // 🌟 2. 重新設計的 Flex 結構
       const flexData = {
         type: "bubble",
         header: {
@@ -472,6 +472,7 @@ async function submitOrder() {
               contents: [
                 {
                   type: "text",
+                  // 🌟 這裡會顯示：NO.c01 ｜ 小雪 (依此類推)
                   text: `NO.${companionId} ｜ ${companionName}`,
                   weight: "bold",
                   size: "xl",
@@ -479,7 +480,7 @@ async function submitOrder() {
                 },
                 {
                   type: "text",
-                  text: "已收到預約申請，請確認以下資訊",
+                  text: "已收到您的預約申請",
                   size: "xs",
                   color: "#818CF8",
                   margin: "xs"
@@ -518,24 +519,9 @@ async function submitOrder() {
               layout: "horizontal",
               margin: "xl",
               contents: [
-                { type: "text", text: "TOTAL", color: "#818CF8", size: "sm", weight: "bold", gravity: "bottom" },
+                { type: "text", text: "付款金額", color: "#818CF8", size: "sm", weight: "bold", gravity: "bottom" },
                 { type: "text", text: `NT$ ${total}`, color: "#F472B6", size: "xxl", align: "end", weight: "bold" }
               ]
-            }
-          ]
-        },
-        footer: {
-          type: "box",
-          layout: "vertical",
-          backgroundColor: "#0F172A",
-          paddingAll: "15px",
-          contents: [
-            {
-              type: "text",
-              text: "請保持手機通暢，客服將盡快聯繫您",
-              size: "xxs",
-              color: "#475569",
-              align: "center"
             }
           ]
         }
@@ -549,14 +535,13 @@ async function submitOrder() {
             contents: flexData
           }]);
           
-          showToast("✅ 預約卡片已傳送！");
+          showToast("✅ 預約已送出！");
           setTimeout(() => { liff.closeWindow(); }, 1200);
         } else {
           liff.login();
         }
       } catch (error) {
-        console.error("發送失敗:", error);
-        alert("發送失敗，請確保在 LINE 內開啟並已授權傳訊權限。");
+        alert("發送失敗(400代表格式錯誤): " + JSON.stringify(error));
         window.location.href = LINE_OFFICIAL_URL;
       } finally {
         btn.innerHTML = '確認送出訂單';
