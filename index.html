@@ -426,65 +426,111 @@
 async function submitOrder() {
       // 1. 抓取表單資料
       const discordId = document.getElementById('discordId').value;
-      const memo = document.getElementById('memo').value || "無";
-      const headerEl = document.getElementById('headerName');
-      const companionName = headerEl ? headerEl.innerText : "未知名導師";
+      const memo = document.getElementById('memo').value || "無備註";
+      const companionName = document.getElementById('headerName').innerText;
       const serviceSelect = document.getElementById('serviceSelect');
-      
-      if(!serviceSelect || !serviceSelect.options.length) {
-        return showToast("尚未選擇服務項目！", true);
-      }
-      
       const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text.split(' (')[0];
       const qty = document.getElementById('quantityDisplay').innerText;
       const unit = document.getElementById('unitDisplay').innerText;
       const total = document.getElementById('totalPrice').innerText;
       const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
-      const promoInfo = promoCode ? `(使用優惠碼: ${promoCode})` : "";
+      const promoInfo = promoCode ? `已套用: ${promoCode}` : "未使用";
 
       if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
 
-      // 🌟 這裡就是你要發送給官方 LINE 客服看到的「預約單文字」
-      const orderMessage = `【九霄劍閣 - 預約訂單】\n` +
-                           `----------------------\n` +
-                           `👤 預約導師：${companionName}\n` +
-                           `🎮 服務項目：${serviceName}\n` +
-                           `🔢 購買數量：${qty} ${unit}\n` +
-                           `💰 總計金額：NT$ ${total} ${promoInfo}\n` +
-                           `🆔 Discord：${discordId}\n` +
-                           `📝 備註事項：${memo}\n` +
-                           `----------------------\n` +
-                           `請稍候，客服將盡快為您安排！`;
-
       const btn = document.getElementById('submitBtn');
-      const ogHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 發送中...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 產生明細中...';
       btn.disabled = true;
 
+      // 🌟 2. 定義 Flex Message 的漂亮結構 (JSON)
+      const flexData = {
+        type: "bubble",
+        size: "md",
+        header: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            { type: "text", text: "九霄劍閣 - 預約成功", color: "#ffffff", weight: "bold", size: "md" }
+          ],
+          backgroundColor: "#4F46E5", // 靛藍色背景
+          paddingAll: "15px"
+        },
+        body: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            { type: "text", text: "感謝您的預約，客服將盡速聯繫您", size: "xs", color: "#888888", margin: "sm" },
+            { type: "separator", margin: "lg", color: "#333333" },
+            {
+              type: "box",
+              layout: "vertical",
+              margin: "lg",
+              spacing: "sm",
+              contents: [
+                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "導師名稱", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: companionName, size: "sm", color: "#ffffff", flex: 4, align: "end", weight: "bold" } ] },
+                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "服務項目", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: serviceName, size: "sm", color: "#ffffff", flex: 4, align: "end" } ] },
+                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "購買數量", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: `${qty} ${unit}`, size: "sm", color: "#ffffff", flex: 4, align: "end" } ] },
+                { type: "box", layout: "horizontal", contents: [ { type: "text", text: "優惠碼", size: "sm", color: "#aaaaaa", flex: 2 }, { type: "text", text: promoInfo, size: "sm", color: "#ffffff", flex: 4, align: "end" } ] }
+              ]
+            },
+            { type: "separator", margin: "lg", color: "#333333" },
+            {
+              type: "box",
+              layout: "horizontal",
+              margin: "lg",
+              contents: [
+                { type: "text", text: "付款金額", size: "sm", color: "#aaaaaa" },
+                { type: "text", text: `NT$ ${total}`, size: "xl", align: "end", weight: "bold", color: "#818CF8" }
+              ]
+            },
+            {
+              type: "box",
+              layout: "vertical",
+              margin: "md",
+              paddingAll: "10px",
+              backgroundColor: "#1F2937",
+              cornerRadius: "md",
+              contents: [
+                { type: "text", text: `Discord: ${discordId}`, size: "xs", color: "#cccccc" },
+                { type: "text", text: `備註: ${memo}`, size: "xs", color: "#999999", margin: "xs", wrap: true }
+              ]
+            }
+          ],
+          backgroundColor: "#111827" // 深灰色背景
+        },
+        footer: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            { type: "text", text: "請稍候客服人員與您聯繫", size: "xs", color: "#aaaaaa", align: "center" }
+          ],
+          backgroundColor: "#111827"
+        }
+      };
+
       try {
-        // 🌟 檢查是否在 LINE 環境 (LIFF)
         if (liff.isInClient()) {
-          // 直接幫客人發訊息給你的官方帳號
+          // 🌟 3. 發送 Flex 訊息
           await liff.sendMessages([{
-            type: "text",
-            text: orderMessage
+            type: "flex",
+            altText: `【九霄劍閣】您有一張來自 ${companionName} 的預約單`, // 當預覽時顯示的文字
+            contents: flexData
           }]);
           
-          showToast("✅ 訂單已傳送給客服！");
-          // 發送成功後，1.5 秒自動關閉網頁視窗
+          showToast("✅ 預約卡片已傳送！");
           setTimeout(() => { liff.closeWindow(); }, 1500);
         } else {
-          // 如果不在 LINE 內（例如電腦測試），告知客人並導向 LINE
-          alert("電腦版不支援自動發訊，請點擊確定後手動聯繫客服。\n\n預約資訊：\n" + orderMessage);
+          // 電腦版或外部瀏覽器則改發純文字
+          const rawText = `【預約單】\n導師: ${companionName}\n服務: ${serviceName}\n金額: NT$ ${total}\nDiscord: ${discordId}`;
+          alert("電腦版不支援發送卡片，請手動告知客服：\n\n" + rawText);
           window.location.href = LINE_OFFICIAL_URL;
         }
       } catch (error) {
-        console.error("發送失敗:", error);
-        // 如果自動發訊失敗（通常是 Scopes 沒勾），顯示錯誤並跳轉
-        alert("自動發訊失敗(請檢查Scopes權限)，即將轉接客服。");
-        window.location.href = LINE_OFFICIAL_URL;
+        console.error("Flex 發送失敗:", error);
+        showToast("發送失敗，請聯繫客服", true);
+        setTimeout(() => { window.location.href = LINE_OFFICIAL_URL; }, 1500);
       } finally {
-        btn.innerHTML = ogHtml;
+        btn.innerHTML = '確認送出訂單';
         btn.disabled = false;
       }
     }
