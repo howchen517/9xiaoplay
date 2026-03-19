@@ -79,8 +79,7 @@
       </div>
     </div>
 
-    <div id="profileGallery" class="w-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar mt-4 px-4 gap-3">
-      </div>
+    <div id="profileGallery" class="w-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar mt-4 px-4 gap-3"></div>
 
     <div class="flex flex-col items-center mt-5 px-4">
       <h1 class="text-2xl font-bold flex items-center gap-2">
@@ -148,7 +147,7 @@
         <div class="mt-4 w-full bg-gray-700 rounded-full h-1.5">
           <div class="bg-gradient-to-r from-indigo-500 to-pink-500 h-1.5 rounded-full" style="width: 45%"></div>
         </div>
-        <p class="text-xs text-gray-500 mt-2">再消費 NT$ 1,500 即可升級為「白金乾爹」</p>
+        <p class="text-xs text-gray-500 mt-2">系統將自動統計您的歷史預約紀錄</p>
       </div>
     </div>
     
@@ -157,7 +156,7 @@
         <div class="flex items-center gap-3 text-gray-200"><i class="fa-solid fa-list-ul text-indigo-400 w-5"></i> 歷史訂單</div>
         <i class="fa-solid fa-chevron-right text-gray-500 text-sm"></i>
       </button>
-      <button class="w-full bg-gray-800 border border-gray-700 p-4 rounded-xl flex justify-between items-center active:scale-[0.98] transition-all">
+      <button onclick="window.location.href=LINE_OFFICIAL_URL" class="w-full bg-gray-800 border border-gray-700 p-4 rounded-xl flex justify-between items-center active:scale-[0.98] transition-all">
         <div class="flex items-center gap-3 text-gray-200"><i class="fa-solid fa-headset text-pink-400 w-5"></i> 聯絡客服</div>
         <i class="fa-solid fa-chevron-right text-gray-500 text-sm"></i>
       </button>
@@ -212,8 +211,11 @@
   <script>
     const MY_LIFF_ID = "2009198027-4SP09i5g";
     const LINE_OFFICIAL_URL = "https://lin.ee/9XKIAym"; 
+    
+    // 🌟 你的專屬 GAS API 網址已套用
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxLHqedAI8AULCuTTc5c_HAidiCm5i_m1rF-mmw82B11PmswvY8tlPoQh86gLWIo-ENkg/exec";
 
-    // 🌟 資料庫設定：包含了多圖 (gallery)
+    // 資料庫設定：包含了多圖 (gallery)
     const DATABASE = {
       banner: {
         image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -259,11 +261,6 @@
       reviews: []
     };
 
-    // 🌟 新增：個人帳戶假資料 (未來可串接資料庫)
-    const MY_ACCOUNT_DATA = {
-      totalSpent: 3500 
-    };
-
     let currentCompanionId = null; 
     let currentQuantity = 1;
     let userProfile = null; 
@@ -296,20 +293,49 @@
       }
     };
 
-    // 🌟 玩家個人中心功能
-    function openMyProfile() {
+    // 🌟 玩家個人中心功能 (自動連線抓取累積消費)
+    async function openMyProfile() {
+      const myProfileView = document.getElementById('myProfileView');
+      myProfileView.classList.remove('hidden');
+      myProfileView.classList.add('view-enter');
+      window.scrollTo(0, 0);
+
+      let uid = "test_uid"; // 如果沒登入LIFF就用測試帳號
+      
       if (userProfile) {
+        uid = userProfile.userId;
         document.getElementById('myProfileName').innerText = userProfile.displayName;
         if (userProfile.pictureUrl) {
           document.getElementById('myProfileAvatar').src = userProfile.pictureUrl;
         }
       }
-      document.getElementById('myTotalSpent').innerText = MY_ACCOUNT_DATA.totalSpent.toLocaleString();
 
-      const myProfileView = document.getElementById('myProfileView');
-      myProfileView.classList.remove('hidden');
-      myProfileView.classList.add('view-enter');
-      window.scrollTo(0, 0);
+      // 畫面先顯示載入中
+      document.getElementById('myTotalSpent').innerText = "...";
+
+      try {
+        // 向 Google 試算表查詢消費總額
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify({
+            action: 'getProfile',
+            lineUid: uid
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          document.getElementById('myTotalSpent').innerText = result.totalSpent.toLocaleString();
+        } else {
+          document.getElementById('myTotalSpent').innerText = "0";
+        }
+      } catch (error) {
+        console.error("讀取資料庫失敗:", error);
+        document.getElementById('myTotalSpent').innerText = "0";
+        showToast("資料讀取失敗，請稍後再試", true);
+      }
     }
 
     function closeMyProfile() {
@@ -499,7 +525,7 @@
       setTimeout(() => { toast.classList.replace('opacity-100', 'opacity-0'); toast.classList.replace('translate-y-0', '-translate-y-5'); }, 3000);
     }
 
-    // 🌟 送出訂單 (LIFF Flex Message)
+    // 🌟 送出訂單 (將資料寫入 Google Sheets，並發送 Flex Message)
     async function submitOrder() {
       const discordId = document.getElementById('discordId').value;
       const memo = document.getElementById('memo').value || "無備註";
@@ -511,45 +537,57 @@
       const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text.split(' (')[0];
       const qty = document.getElementById('quantityDisplay').innerText;
       const unit = document.getElementById('unitDisplay').innerText;
-      const total = document.getElementById('totalPrice').innerText;
+      const totalAmount = parseInt(document.getElementById('totalPrice').innerText);
 
       if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
 
       const btn = document.getElementById('submitBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 傳送中...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 處理中...';
       btn.disabled = true;
 
-      const flexData = {
-        type: "bubble",
-        header: {
-          type: "box",
-          layout: "vertical",
-          backgroundColor: "#4F46E5",
-          contents: [
-            { type: "text", text: "🎮 九霄劍閣 - 預約需求", color: "#FFFFFF", weight: "bold", size: "md" }
-          ]
-        },
-        body: {
-          type: "box",
-          layout: "vertical",
-          backgroundColor: "#111827",
-          contents: [
-            { type: "text", text: `預約導師：${companionName}`, weight: "bold", size: "md", color: "#FFFFFF" },
-            { type: "text", text: `服務項目：${serviceName} x ${qty} ${unit}`, size: "xs", color: "#AAAAAA", margin: "md" },
-            { type: "text", text: `應付金額：NT$ ${total}`, size: "xl", color: "#818CF8", weight: "bold", margin: "md" },
-            { type: "separator", margin: "xl", color: "#333333" },
-            {
-              type: "box", layout: "vertical", margin: "md",
-              contents: [
-                { type: "text", text: `Discord：${discordId}`, color: "#DDDDDD", size: "xs" },
-                { type: "text", text: `備註：${memo}`, color: "#999999", size: "xs", margin: "xs", wrap: true }
-              ]
-            }
-          ]
-        }
-      };
+      const uid = userProfile ? userProfile.userId : "test_uid";
+      const uName = userProfile ? userProfile.displayName : "網頁訪客";
 
       try {
+        // 1. 將訂單資料發送到 GAS (背景執行)
+        fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: 'addOrder',
+            lineUid: uid,
+            userName: uName,
+            companionName: companionName,
+            totalAmount: totalAmount
+          })
+        }).catch(e => console.error("寫入資料庫失敗", e)); 
+
+        // 2. 準備給使用者的 Flex Message 卡片
+        const flexData = {
+          type: "bubble",
+          header: {
+            type: "box", layout: "vertical", backgroundColor: "#4F46E5",
+            contents: [{ type: "text", text: "🎮 九霄劍閣 - 預約需求", color: "#FFFFFF", weight: "bold", size: "md" }]
+          },
+          body: {
+            type: "box", layout: "vertical", backgroundColor: "#111827",
+            contents: [
+              { type: "text", text: `預約導師：${companionName}`, weight: "bold", size: "md", color: "#FFFFFF" },
+              { type: "text", text: `服務項目：${serviceName} x ${qty} ${unit}`, size: "xs", color: "#AAAAAA", margin: "md" },
+              { type: "text", text: `應付金額：NT$ ${totalAmount}`, size: "xl", color: "#818CF8", weight: "bold", margin: "md" },
+              { type: "separator", margin: "xl", color: "#333333" },
+              {
+                type: "box", layout: "vertical", margin: "md",
+                contents: [
+                  { type: "text", text: `Discord：${discordId}`, color: "#DDDDDD", size: "xs" },
+                  { type: "text", text: `備註：${memo}`, color: "#999999", size: "xs", margin: "xs", wrap: true }
+                ]
+              }
+            ]
+          }
+        };
+
+        // 3. 發送訊息給 LINE
         if (liff.isLoggedIn()) {
           await liff.sendMessages([{
             type: "flex",
@@ -557,13 +595,13 @@
             contents: flexData
           }]);
           
-          showToast("✅ 預約卡片已傳送！");
+          showToast("✅ 預約成功！");
           setTimeout(() => { liff.closeWindow(); }, 1200);
         } else {
           liff.login();
         }
       } catch (error) {
-        alert("發送失敗！代碼：" + error.code + "\n訊息：" + error.message);
+        alert("發送失敗！請確認是否在 LINE App 內開啟。");
         window.location.href = LINE_OFFICIAL_URL;
       } finally {
         btn.innerHTML = '確認送出訂單';
