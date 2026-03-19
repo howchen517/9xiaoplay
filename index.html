@@ -78,43 +78,33 @@
         <span class="text-md font-bold tracking-widest text-gray-200" id="headerName">導師名片</span>
       </div>
     </div>
-
     <div id="profileGallery" class="w-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar mt-4 px-4 gap-3"></div>
-
     <div class="flex flex-col items-center mt-5 px-4">
       <h1 class="text-2xl font-bold flex items-center gap-2">
         <span id="profileName">載入中</span>
         <span class="w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
       </h1>
       <p class="text-gray-400 text-sm mt-1">ID: <span id="profileId">----</span> • 綜合評分 <i class="fa-solid fa-star text-yellow-500"></i> <span id="profileRating">-.-</span></p>
-      
       <button onclick="togglePlay()" class="mt-4 flex items-center gap-2 bg-gray-800 hover:bg-gray-700 active:scale-95 border border-gray-700 px-6 py-2.5 rounded-full w-full max-w-xs justify-center shadow-sm transition-all">
         <i id="playIcon" class="fa-solid fa-circle-play text-lg text-indigo-400"></i>
         <span id="playText" class="font-bold text-sm text-indigo-200 tracking-wider">點擊試聽專屬語音</span>
       </button>
     </div>
-
     <div id="tagsContainer" class="flex flex-wrap justify-center gap-2 mt-5 px-4"></div>
-
     <div class="mt-8 px-5">
       <h2 class="text-sm font-bold text-gray-400 mb-3 tracking-widest uppercase border-l-4 border-indigo-500 pl-2">關於我</h2>
       <p id="profileIntro" class="text-gray-200 text-sm leading-relaxed bg-gray-800/40 p-5 rounded-2xl border border-gray-800 whitespace-pre-line"></p>
     </div>
-
     <div class="mt-8 px-5">
       <h2 class="text-sm font-bold text-gray-400 mb-3 tracking-widest uppercase border-l-4 border-pink-500 pl-2">服務項目</h2>
       <div id="servicesContainer"></div>
     </div>
-
     <div class="mt-8 px-5 pb-6">
       <h2 class="text-sm font-bold text-gray-400 mb-3 tracking-widest uppercase border-l-4 border-yellow-500 pl-2">顧客評價</h2>
       <div id="reviewsContainer"></div>
     </div>
-
     <div class="fixed bottom-0 left-0 w-full bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 p-4 pb-safe z-50">
-      <button onclick="openModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-[0_4px_20px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 text-lg">
-        立即預約
-      </button>
+      <button onclick="openModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-[0_4px_20px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 text-lg">立即預約</button>
     </div>
   </div>
 
@@ -127,7 +117,6 @@
         <span class="text-md font-bold tracking-widest text-gray-200">個人中心</span>
       </div>
     </div>
-
     <div class="px-5 mt-8 flex flex-col items-center">
       <img id="myProfileAvatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="w-24 h-24 rounded-full object-cover border-4 border-gray-700 shadow-lg">
       <h2 id="myProfileName" class="text-2xl font-bold mt-4 text-white">載入中...</h2>
@@ -135,7 +124,6 @@
         <i class="fa-solid fa-crown"></i> 尊爵會員
       </div>
     </div>
-
     <div class="px-5 mt-8">
       <div class="bg-gradient-to-br from-gray-800 to-gray-800/50 p-6 rounded-2xl border border-gray-700 shadow-lg relative overflow-hidden">
         <i class="fa-solid fa-coins absolute -right-4 -bottom-4 text-6xl text-gray-700/30"></i>
@@ -150,9 +138,8 @@
         <p class="text-xs text-gray-500 mt-2">系統將自動統計您的歷史預約紀錄</p>
       </div>
     </div>
-    
     <div class="px-5 mt-6 space-y-3">
-      <button class="w-full bg-gray-800 border border-gray-700 p-4 rounded-xl flex justify-between items-center active:scale-[0.98] transition-all">
+      <button onclick="openHistory()" class="w-full bg-gray-800 border border-gray-700 p-4 rounded-xl flex justify-between items-center active:scale-[0.98] transition-all">
         <div class="flex items-center gap-3 text-gray-200"><i class="fa-solid fa-list-ul text-indigo-400 w-5"></i> 歷史訂單</div>
         <i class="fa-solid fa-chevron-right text-gray-500 text-sm"></i>
       </button>
@@ -163,6 +150,24 @@
     </div>
   </div>
 
+  <div id="historyView" class="w-full min-h-screen pb-24 hidden absolute top-0 left-0 bg-gray-900 z-[90]">
+    <div class="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md px-4 py-3 flex items-center border-b border-gray-800/50">
+      <button onclick="closeHistory()" class="relative z-50 flex items-center gap-2 text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95">
+        <i class="fa-solid fa-chevron-left"></i> 返回
+      </button>
+      <div class="absolute left-0 w-full text-center pointer-events-none">
+        <span class="text-md font-bold tracking-widest text-gray-200">歷史訂單</span>
+      </div>
+    </div>
+    
+    <div class="px-4 mt-6">
+      <div id="historyLoading" class="text-center py-10 text-gray-400 text-sm">
+        <i class="fa-solid fa-spinner fa-spin text-2xl text-indigo-500 mb-3"></i><br>正在讀取訂單資料...
+      </div>
+      <div id="historyListContainer" class="space-y-4 hidden"></div>
+    </div>
+  </div>
+
   <div id="modalOverlay" class="fixed inset-0 bg-black/70 z-[60] hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm" onclick="closeModal()"></div>
   <div id="bookingSheet" class="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-700 rounded-t-3xl z-[70] transform translate-y-full transition-transform duration-300 ease-out p-6 pb-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
     <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mb-5"></div>
@@ -170,7 +175,6 @@
       <h2 class="text-xl font-bold text-gray-100">預約 <span id="modalTargetName" class="text-indigo-400"></span></h2>
       <button onclick="closeModal()" class="text-gray-400 bg-gray-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
     </div>
-
     <div class="space-y-5">
       <div>
         <label class="block text-sm font-medium text-gray-400 mb-2">選擇服務</label>
@@ -211,16 +215,13 @@
   <script>
     const MY_LIFF_ID = "2009198027-4SP09i5g";
     const LINE_OFFICIAL_URL = "https://lin.ee/9XKIAym"; 
-    
-    // 🌟 你的專屬 GAS API 網址已套用
-    const GAS_API_URL = "https://script.google.com/macros/library/d/1Gk1W4jMn9RKttkpN5bLhISgjEWFtOiRo1vQng4P53x1NW1AyD1wfqQmT/2";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxLHqedAI8AULCuTTc5c_HAidiCm5i_m1rF-mmw82B11PmswvY8tlPoQh86gLWIo-ENkg/exec";
 
-    // 資料庫設定：包含了多圖 (gallery)
+    // 資料庫設定
     const DATABASE = {
       banner: {
         image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tag: "限時活動",
-        title: "九霄劍閣全新上線！指定導師享優惠"
+        tag: "限時活動", title: "九霄劍閣全新上線！指定導師享優惠"
       },
       companions: [
         { 
@@ -230,17 +231,13 @@
           gallery: [
             "https://images.unsplash.com/photo-1583513702439-2e611c58e93d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1618077360395-f3068be8e001?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-          ],
-          audio: "" 
+          ], audio: "" 
         },
         { 
           id: "c02", name: "夜神", rating: "5.0", tags: "特戰英豪,頂尖射手,上分", 
           intro: "各路皆通，保證上分，不C包退。", 
           avatar: "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80", 
-          gallery: [
-            "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-          ],
-          audio: "" 
+          gallery: ["https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"], audio: "" 
         },
         { 
           id: "c03", name: "兔兔", rating: "4.8", tags: "語音聊天,唱歌", 
@@ -249,23 +246,18 @@
           gallery: [
             "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-          ],
-          audio: "" 
+          ], audio: "" 
         }
       ],
       services: [
         { companion_id: "c01", name: "傳說對決", desc: "星耀區間帶飛", price: 100, unit: "局", icon: "fa-gamepad", color: "indigo" },
         { companion_id: "c02", name: "特戰英豪", desc: "神話場可排", price: 150, unit: "場", icon: "fa-crosshairs", color: "red" },
         { companion_id: "c03", name: "語音聊天", desc: "純聊天解悶", price: 200, unit: "小時", icon: "fa-microphone", color: "pink" }
-      ],
-      reviews: []
+      ]
     };
 
-    let currentCompanionId = null; 
-    let currentQuantity = 1;
-    let userProfile = null; 
-    const audioPlayer = new Audio();
-    let isPlaying = false;
+    let currentCompanionId = null; let currentQuantity = 1; let userProfile = null; 
+    const audioPlayer = new Audio(); let isPlaying = false;
 
     window.onload = async () => {
       try {
@@ -275,7 +267,6 @@
         renderList(DATABASE.companions);
 
         await liff.init({ liffId: MY_LIFF_ID });
-        
         if (liff.isLoggedIn()) {
           userProfile = await liff.getProfile();
           document.getElementById('userNameDisplay').innerText = userProfile.displayName;
@@ -283,56 +274,32 @@
             document.getElementById('userAvatarDisplay').src = userProfile.pictureUrl;
             document.getElementById('userAvatarDisplay').classList.remove('hidden');
           }
-        } else {
-          liff.login();
-        }
-      } catch (err) {
-        console.error("LIFF 錯誤:", err);
-      } finally {
-        document.getElementById('loadingOverlay').classList.add('opacity-0', 'pointer-events-none');
-      }
+        } else { liff.login(); }
+      } catch (err) { console.error("LIFF 錯誤:", err); } 
+      finally { document.getElementById('loadingOverlay').classList.add('opacity-0', 'pointer-events-none'); }
     };
 
-    // 🌟 玩家個人中心功能 (自動連線抓取累積消費)
     async function openMyProfile() {
       const myProfileView = document.getElementById('myProfileView');
-      myProfileView.classList.remove('hidden');
-      myProfileView.classList.add('view-enter');
+      myProfileView.classList.remove('hidden'); myProfileView.classList.add('view-enter');
       window.scrollTo(0, 0);
 
-      let uid = "test_uid"; // 如果沒登入LIFF就用測試帳號
-      
+      let uid = userProfile ? userProfile.userId : "test_uid";
       if (userProfile) {
-        uid = userProfile.userId;
         document.getElementById('myProfileName').innerText = userProfile.displayName;
-        if (userProfile.pictureUrl) {
-          document.getElementById('myProfileAvatar').src = userProfile.pictureUrl;
-        }
+        if (userProfile.pictureUrl) document.getElementById('myProfileAvatar').src = userProfile.pictureUrl;
       }
-
-      // 畫面先顯示載入中
       document.getElementById('myTotalSpent').innerText = "...";
 
       try {
-        // 向 Google 試算表查詢消費總額
         const response = await fetch(GAS_API_URL, {
-          method: 'POST',
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify({
-            action: 'getProfile',
-            lineUid: uid
-          })
+          method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify({ action: 'getProfile', lineUid: uid })
         });
-        
         const result = await response.json();
-        
-        if (result.status === "success") {
-          document.getElementById('myTotalSpent').innerText = result.totalSpent.toLocaleString();
-        } else {
-          document.getElementById('myTotalSpent').innerText = "0";
-        }
+        if (result.status === "success") document.getElementById('myTotalSpent').innerText = result.totalSpent.toLocaleString();
+        else document.getElementById('myTotalSpent').innerText = "0";
       } catch (error) {
-        console.error("讀取資料庫失敗:", error);
         document.getElementById('myTotalSpent').innerText = "0";
         showToast("資料讀取失敗，請稍後再試", true);
       }
@@ -340,273 +307,142 @@
 
     function closeMyProfile() {
       const myProfileView = document.getElementById('myProfileView');
-      myProfileView.classList.remove('view-enter');
-      myProfileView.classList.add('view-leave');
-      setTimeout(() => {
-        myProfileView.classList.add('hidden');
-        myProfileView.classList.remove('view-leave');
-      }, 300);
+      myProfileView.classList.remove('view-enter'); myProfileView.classList.add('view-leave');
+      setTimeout(() => { myProfileView.classList.add('hidden'); myProfileView.classList.remove('view-leave'); }, 300);
     }
 
-    // 分類過濾
+    // 🌟 新增：打開歷史訂單與讀取資料
+    async function openHistory() {
+      const view = document.getElementById('historyView');
+      const container = document.getElementById('historyListContainer');
+      const loader = document.getElementById('historyLoading');
+      
+      view.classList.remove('hidden'); view.classList.add('view-enter');
+      container.classList.add('hidden'); loader.classList.remove('hidden');
+      window.scrollTo(0, 0);
+
+      let uid = userProfile ? userProfile.userId : "test_uid";
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: 'getHistory', lineUid: uid })
+        });
+        const result = await response.json();
+        
+        loader.classList.add('hidden');
+        container.classList.remove('hidden');
+
+        if (result.status === "success" && result.data.length > 0) {
+          let html = '';
+          result.data.forEach(order => {
+            // 轉換日期格式
+            const dateObj = new Date(order.time);
+            const dateStr = `${dateObj.getFullYear()}/${(dateObj.getMonth()+1).toString().padStart(2, '0')}/${dateObj.getDate().toString().padStart(2, '0')}`;
+            
+            // 判斷狀態給予不同顏色
+            const isValid = order.status !== '取消';
+            const statusColor = isValid ? 'text-green-400 bg-green-900/30 border-green-700/50' : 'text-red-400 bg-red-900/30 border-red-700/50';
+            const priceColor = isValid ? 'text-indigo-300' : 'text-gray-500 line-through';
+
+            html += `
+              <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-md flex justify-between items-center">
+                <div>
+                  <div class="text-xs text-gray-400 mb-1">${dateStr}</div>
+                  <div class="font-bold text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad text-indigo-500 text-sm"></i>
+                    ${order.companion}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs px-2 py-0.5 rounded border mb-1 inline-block ${statusColor}">${order.status || '有效'}</div>
+                  <div class="font-bold ${priceColor}">NT$ ${order.amount}</div>
+                </div>
+              </div>
+            `;
+          });
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = `<div class="text-center py-10 text-gray-500"><i class="fa-solid fa-box-open text-3xl mb-3"></i><br>您目前還沒有歷史訂單喔！</div>`;
+        }
+      } catch (error) {
+        loader.classList.add('hidden');
+        container.classList.remove('hidden');
+        container.innerHTML = `<div class="text-center py-10 text-red-400">讀取失敗，請重新整理試試。</div>`;
+      }
+    }
+
+    function closeHistory() {
+      const view = document.getElementById('historyView');
+      view.classList.remove('view-enter'); view.classList.add('view-leave');
+      setTimeout(() => { view.classList.add('hidden'); view.classList.remove('view-leave'); }, 300);
+    }
+
+    // (下方保留：filterCategory, renderList, openProfile, goHome, togglePlay, calculateTotal, changeQuantity, openModal, closeModal, showToast, submitOrder 等函式...)
+    
     function filterCategory(category, clickedBtn) {
       const btns = document.querySelectorAll('.cat-btn');
-      btns.forEach(btn => {
-        btn.className = "cat-btn bg-gray-800 text-gray-300 border border-gray-700 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all";
-      });
+      btns.forEach(btn => btn.className = "cat-btn bg-gray-800 text-gray-300 border border-gray-700 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all");
       clickedBtn.className = "cat-btn bg-white text-gray-900 px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap shadow-sm transition-all";
-
-      const grid = document.getElementById('companionsGrid');
-      const noDataMsg = document.getElementById('noDataMsg');
-      
-      let filtered = DATABASE.companions;
-      if (category !== '全部') {
-        filtered = DATABASE.companions.filter(c => c.tags.includes(category));
-      }
-      
-      if(filtered.length === 0) {
-        grid.innerHTML = '';
-        noDataMsg.classList.remove('hidden');
-      } else {
-        noDataMsg.classList.add('hidden');
-        renderList(filtered);
-      }
+      const grid = document.getElementById('companionsGrid'); const noDataMsg = document.getElementById('noDataMsg');
+      let filtered = category !== '全部' ? DATABASE.companions.filter(c => c.tags.includes(category)) : DATABASE.companions;
+      if(filtered.length === 0) { grid.innerHTML = ''; noDataMsg.classList.remove('hidden'); } 
+      else { noDataMsg.classList.add('hidden'); renderList(filtered); }
     }
 
-    // 渲染導師列表
     function renderList(companions) {
-      const grid = document.getElementById('companionsGrid');
-      let html = '';
+      const grid = document.getElementById('companionsGrid'); let html = '';
       companions.forEach(c => {
         const firstTag = (c.tags || '').split(',')[0] || '人氣導師';
-        html += `
-          <div onclick="openProfile('${c.id}')" class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-md transform transition active:scale-95 cursor-pointer">
-            <div class="h-32 w-full bg-gray-700 relative">
-              <img src="${c.avatar || ''}" class="w-full h-full object-cover">
-              <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white border border-white/20">
-                <i class="fa-solid fa-star text-yellow-400 mr-1"></i>${c.rating || '5.0'}
-              </div>
-            </div>
-            <div class="p-3">
-              <h3 class="font-bold text-gray-100 text-sm truncate">${c.name || '導師'}</h3>
-              <div class="text-[11px] text-indigo-400 mt-1 bg-indigo-900/30 inline-block px-1.5 py-0.5 rounded border border-indigo-700/50 truncate max-w-full">
-                ${firstTag}
-              </div>
-            </div>
-          </div>
-        `;
+        html += `<div onclick="openProfile('${c.id}')" class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-md transform transition active:scale-95 cursor-pointer"><div class="h-32 w-full bg-gray-700 relative"><img src="${c.avatar || ''}" class="w-full h-full object-cover"><div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white border border-white/20"><i class="fa-solid fa-star text-yellow-400 mr-1"></i>${c.rating || '5.0'}</div></div><div class="p-3"><h3 class="font-bold text-gray-100 text-sm truncate">${c.name || '導師'}</h3><div class="text-[11px] text-indigo-400 mt-1 bg-indigo-900/30 inline-block px-1.5 py-0.5 rounded border border-indigo-700/50 truncate max-w-full">${firstTag}</div></div></div>`;
       });
       grid.innerHTML = html;
     }
 
-    // 開啟導師主頁
     function openProfile(id) {
-      currentCompanionId = id;
-      const companion = DATABASE.companions.find(c => c.id === id);
-      if(!companion) return;
-
-      document.getElementById('headerName').innerText = companion.name;
-      document.getElementById('profileName').innerText = companion.name;
-      document.getElementById('profileId').innerText = companion.id;
-      document.getElementById('profileRating').innerText = companion.rating;
-      document.getElementById('profileIntro').innerText = companion.intro;
-      document.getElementById('modalTargetName').innerText = `- ${companion.name}`;
-
-      // 渲染多圖輪播
-      const galleryContainer = document.getElementById('profileGallery');
-      let galleryHtml = '';
-      const images = (companion.gallery && companion.gallery.length > 0) ? companion.gallery : [companion.avatar];
-
-      images.forEach(imgUrl => {
-        galleryHtml += `
-          <div class="snap-center shrink-0 w-[85%] md:w-[70%]">
-            <img src="${imgUrl}" class="w-full h-64 md:h-80 object-cover rounded-2xl shadow-md border border-gray-700">
-          </div>
-        `;
-      });
-      galleryContainer.innerHTML = galleryHtml;
-
-      audioPlayer.src = companion.audio || "";
-      resetPlayButton();
-
-      let tagsHtml = (companion.tags || '').split(',').filter(Boolean).map(tag => 
-        `<span class="bg-indigo-900/30 text-indigo-300 border border-indigo-700/50 px-3 py-1 rounded-full text-xs font-semibold">${tag.trim()}</span>`
-      ).join('');
-      document.getElementById('tagsContainer').innerHTML = tagsHtml;
-
-      const myServices = DATABASE.services.filter(s => s.companion_id === id);
-      let servicesHtml = ''; let optionsHtml = '';
-      myServices.forEach(srv => {
-        const clr = srv.color || 'indigo'; const icn = srv.icon || 'fa-gamepad';
-        servicesHtml += `
-          <div class="bg-gray-800 rounded-2xl p-4 mb-3 flex justify-between items-center border border-gray-700">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-${clr}-900/40 text-${clr}-400 rounded-xl flex justify-center items-center text-xl border border-${clr}-700/50"><i class="fa-solid ${icn}"></i></div>
-              <div><h3 class="font-bold text-gray-100">${srv.name}</h3><p class="text-gray-400 text-xs">${srv.desc}</p></div>
-            </div>
-            <div class="text-right"><div class="text-${clr}-400 font-bold">NT$ ${srv.price}</div><div class="text-gray-500 text-xs">/ ${srv.unit}</div></div>
-          </div>`;
-        optionsHtml += `<option value="${srv.price}" data-unit="${srv.unit}">${srv.name} (NT$ ${srv.price} / ${srv.unit})</option>`;
-      });
-      document.getElementById('servicesContainer').innerHTML = servicesHtml || '<p class="text-gray-500 text-sm">尚無服務</p>';
-      document.getElementById('serviceSelect').innerHTML = optionsHtml;
-      
-      document.getElementById('reviewsContainer').innerHTML = '<p class="text-gray-500 text-sm">目前無評價</p>';
-
-      const profile = document.getElementById('profileView');
-      profile.classList.remove('hidden');
-      profile.classList.add('view-enter');
-      
-      galleryContainer.scrollTo(0, 0); 
-      window.scrollTo(0, 0); 
+      currentCompanionId = id; const companion = DATABASE.companions.find(c => c.id === id); if(!companion) return;
+      document.getElementById('headerName').innerText = companion.name; document.getElementById('profileName').innerText = companion.name; document.getElementById('profileId').innerText = companion.id; document.getElementById('profileRating').innerText = companion.rating; document.getElementById('profileIntro').innerText = companion.intro; document.getElementById('modalTargetName').innerText = `- ${companion.name}`;
+      const galleryContainer = document.getElementById('profileGallery'); let galleryHtml = ''; const images = (companion.gallery && companion.gallery.length > 0) ? companion.gallery : [companion.avatar];
+      images.forEach(imgUrl => galleryHtml += `<div class="snap-center shrink-0 w-[85%] md:w-[70%]"><img src="${imgUrl}" class="w-full h-64 md:h-80 object-cover rounded-2xl shadow-md border border-gray-700"></div>`);
+      galleryContainer.innerHTML = galleryHtml; audioPlayer.src = companion.audio || ""; resetPlayButton();
+      document.getElementById('tagsContainer').innerHTML = (companion.tags || '').split(',').filter(Boolean).map(tag => `<span class="bg-indigo-900/30 text-indigo-300 border border-indigo-700/50 px-3 py-1 rounded-full text-xs font-semibold">${tag.trim()}</span>`).join('');
+      let servicesHtml = ''; let optionsHtml = ''; DATABASE.services.filter(s => s.companion_id === id).forEach(srv => { const clr = srv.color || 'indigo'; const icn = srv.icon || 'fa-gamepad'; servicesHtml += `<div class="bg-gray-800 rounded-2xl p-4 mb-3 flex justify-between items-center border border-gray-700"><div class="flex items-center gap-4"><div class="w-12 h-12 bg-${clr}-900/40 text-${clr}-400 rounded-xl flex justify-center items-center text-xl border border-${clr}-700/50"><i class="fa-solid ${icn}"></i></div><div><h3 class="font-bold text-gray-100">${srv.name}</h3><p class="text-gray-400 text-xs">${srv.desc}</p></div></div><div class="text-right"><div class="text-${clr}-400 font-bold">NT$ ${srv.price}</div><div class="text-gray-500 text-xs">/ ${srv.unit}</div></div></div>`; optionsHtml += `<option value="${srv.price}" data-unit="${srv.unit}">${srv.name} (NT$ ${srv.price} / ${srv.unit})</option>`; });
+      document.getElementById('servicesContainer').innerHTML = servicesHtml || '<p class="text-gray-500 text-sm">尚無服務</p>'; document.getElementById('serviceSelect').innerHTML = optionsHtml; document.getElementById('reviewsContainer').innerHTML = '<p class="text-gray-500 text-sm">目前無評價</p>';
+      const profile = document.getElementById('profileView'); profile.classList.remove('hidden'); profile.classList.add('view-enter'); galleryContainer.scrollTo(0, 0); window.scrollTo(0, 0); 
     }
 
     function goHome() {
-      audioPlayer.pause();
-      resetPlayButton();
-      closeModal();       
-      const profile = document.getElementById('profileView');
-      profile.classList.remove('view-enter');
-      profile.classList.add('view-leave');
-      setTimeout(() => {
-        profile.classList.add('hidden');
-        profile.classList.remove('view-leave');
-        currentCompanionId = null;
-        window.scrollTo({ top: 0, behavior: 'smooth' }); 
-      }, 300);
+      audioPlayer.pause(); resetPlayButton(); closeModal();       
+      const profile = document.getElementById('profileView'); profile.classList.remove('view-enter'); profile.classList.add('view-leave');
+      setTimeout(() => { profile.classList.add('hidden'); profile.classList.remove('view-leave'); currentCompanionId = null; window.scrollTo({ top: 0, behavior: 'smooth' }); }, 300);
     }
 
-    // 語音播放功能
     function togglePlay() {
-      const icon = document.getElementById('playIcon'); 
-      const text = document.getElementById('playText');
+      const icon = document.getElementById('playIcon'); const text = document.getElementById('playText');
       if (!audioPlayer.src || audioPlayer.src.endsWith("undefined") || audioPlayer.src === window.location.href) return showToast("這位導師還沒有上傳專屬語音喔！", true);
-      if (isPlaying) { audioPlayer.pause(); resetPlayButton(); } 
-      else { audioPlayer.play(); isPlaying = true; icon.className = 'fa-solid fa-circle-pause text-lg text-pink-400'; text.innerText = '語音播放中...'; text.className = 'font-bold text-sm text-pink-300 tracking-wider'; }
+      if (isPlaying) { audioPlayer.pause(); resetPlayButton(); } else { audioPlayer.play(); isPlaying = true; icon.className = 'fa-solid fa-circle-pause text-lg text-pink-400'; text.innerText = '語音播放中...'; text.className = 'font-bold text-sm text-pink-300 tracking-wider'; }
     }
     audioPlayer.onended = resetPlayButton;
-    function resetPlayButton() {
-      isPlaying = false; const icon = document.getElementById('playIcon'); const text = document.getElementById('playText');
-      if(icon && text) { icon.className = 'fa-solid fa-circle-play text-lg text-indigo-400'; text.innerText = '點擊試聽專屬語音'; text.className = 'font-bold text-sm text-indigo-200 tracking-wider'; }
-    }
+    function resetPlayButton() { isPlaying = false; const icon = document.getElementById('playIcon'); const text = document.getElementById('playText'); if(icon && text) { icon.className = 'fa-solid fa-circle-play text-lg text-indigo-400'; text.innerText = '點擊試聽專屬語音'; text.className = 'font-bold text-sm text-indigo-200 tracking-wider'; } }
+    function calculateTotal() { const sel = document.getElementById('serviceSelect'); if(!sel.options.length) return; const opt = sel.options[sel.selectedIndex]; document.getElementById('unitDisplay').innerText = opt.getAttribute('data-unit'); document.getElementById('totalPrice').innerText = parseInt(opt.value) * currentQuantity; }
+    function changeQuantity(c) { if(currentQuantity + c >= 1) { currentQuantity += c; document.getElementById('quantityDisplay').innerText = currentQuantity; calculateTotal(); } }
+    function openModal() { const overlay = document.getElementById('modalOverlay'); const sheet = document.getElementById('bookingSheet'); overlay.classList.remove('hidden'); void overlay.offsetWidth; overlay.classList.replace('opacity-0', 'opacity-100'); sheet.classList.remove('translate-y-full'); currentQuantity = 1; document.getElementById('quantityDisplay').innerText = 1; calculateTotal(); }
+    function closeModal() { const overlay = document.getElementById('modalOverlay'); const sheet = document.getElementById('bookingSheet'); sheet.classList.add('translate-y-full'); overlay.classList.replace('opacity-100', 'opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 300); }
+    function showToast(msg, isError=false) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; document.getElementById('toastIcon').className = isError ? 'fa-solid fa-circle-exclamation text-red-400 text-lg' : 'fa-solid fa-circle-check text-green-400 text-lg'; toast.classList.replace('opacity-0', 'opacity-100'); toast.classList.replace('-translate-y-5', 'translate-y-0'); setTimeout(() => { toast.classList.replace('opacity-100', 'opacity-0'); toast.classList.replace('translate-y-0', '-translate-y-5'); }, 3000); }
 
-    // 購物車與數量計算
-    function calculateTotal() {
-      const sel = document.getElementById('serviceSelect');
-      if(!sel.options.length) return;
-      const opt = sel.options[sel.selectedIndex];
-      document.getElementById('unitDisplay').innerText = opt.getAttribute('data-unit');
-      document.getElementById('totalPrice').innerText = parseInt(opt.value) * currentQuantity;
-    }
-
-    function changeQuantity(c) {
-      if(currentQuantity + c >= 1) { currentQuantity += c; document.getElementById('quantityDisplay').innerText = currentQuantity; calculateTotal(); }
-    }
-
-    function openModal() {
-      const overlay = document.getElementById('modalOverlay'); const sheet = document.getElementById('bookingSheet');
-      overlay.classList.remove('hidden'); void overlay.offsetWidth; overlay.classList.replace('opacity-0', 'opacity-100');
-      sheet.classList.remove('translate-y-full');
-      currentQuantity = 1; document.getElementById('quantityDisplay').innerText = 1;
-      calculateTotal();
-    }
-
-    function closeModal() {
-      const overlay = document.getElementById('modalOverlay'); const sheet = document.getElementById('bookingSheet');
-      sheet.classList.add('translate-y-full'); overlay.classList.replace('opacity-100', 'opacity-0');
-      setTimeout(() => overlay.classList.add('hidden'), 300);
-    }
-
-    function showToast(msg, isError=false) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').innerText = msg;
-      document.getElementById('toastIcon').className = isError ? 'fa-solid fa-circle-exclamation text-red-400 text-lg' : 'fa-solid fa-circle-check text-green-400 text-lg';
-      toast.classList.replace('opacity-0', 'opacity-100'); toast.classList.replace('-translate-y-5', 'translate-y-0');
-      setTimeout(() => { toast.classList.replace('opacity-100', 'opacity-0'); toast.classList.replace('translate-y-0', '-translate-y-5'); }, 3000);
-    }
-
-    // 🌟 送出訂單 (將資料寫入 Google Sheets，並發送 Flex Message)
     async function submitOrder() {
-      const discordId = document.getElementById('discordId').value;
-      const memo = document.getElementById('memo').value || "無備註";
-      const companionName = document.getElementById('headerName').innerText;
-      const serviceSelect = document.getElementById('serviceSelect');
-      
+      const discordId = document.getElementById('discordId').value; const memo = document.getElementById('memo').value || "無備註"; const companionName = document.getElementById('headerName').innerText; const serviceSelect = document.getElementById('serviceSelect');
       if(!serviceSelect.options.length) return showToast("請選擇服務", true);
-      
-      const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text.split(' (')[0];
-      const qty = document.getElementById('quantityDisplay').innerText;
-      const unit = document.getElementById('unitDisplay').innerText;
-      const totalAmount = parseInt(document.getElementById('totalPrice').innerText);
-
+      const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text.split(' (')[0]; const qty = document.getElementById('quantityDisplay').innerText; const unit = document.getElementById('unitDisplay').innerText; const totalAmount = parseInt(document.getElementById('totalPrice').innerText);
       if(!discordId.trim()) return showToast("請填寫 Discord ID！", true);
-
-      const btn = document.getElementById('submitBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 處理中...';
-      btn.disabled = true;
-
-      const uid = userProfile ? userProfile.userId : "test_uid";
-      const uName = userProfile ? userProfile.displayName : "網頁訪客";
+      const btn = document.getElementById('submitBtn'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 處理中...'; btn.disabled = true;
+      const uid = userProfile ? userProfile.userId : "test_uid"; const uName = userProfile ? userProfile.displayName : "網頁訪客";
 
       try {
-        // 1. 將訂單資料發送到 GAS (背景執行)
-        fetch(GAS_API_URL, {
-          method: 'POST',
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: 'addOrder',
-            lineUid: uid,
-            userName: uName,
-            companionName: companionName,
-            totalAmount: totalAmount
-          })
-        }).catch(e => console.error("寫入資料庫失敗", e)); 
-
-        // 2. 準備給使用者的 Flex Message 卡片
-        const flexData = {
-          type: "bubble",
-          header: {
-            type: "box", layout: "vertical", backgroundColor: "#4F46E5",
-            contents: [{ type: "text", text: "🎮 九霄劍閣 - 預約需求", color: "#FFFFFF", weight: "bold", size: "md" }]
-          },
-          body: {
-            type: "box", layout: "vertical", backgroundColor: "#111827",
-            contents: [
-              { type: "text", text: `預約導師：${companionName}`, weight: "bold", size: "md", color: "#FFFFFF" },
-              { type: "text", text: `服務項目：${serviceName} x ${qty} ${unit}`, size: "xs", color: "#AAAAAA", margin: "md" },
-              { type: "text", text: `應付金額：NT$ ${totalAmount}`, size: "xl", color: "#818CF8", weight: "bold", margin: "md" },
-              { type: "separator", margin: "xl", color: "#333333" },
-              {
-                type: "box", layout: "vertical", margin: "md",
-                contents: [
-                  { type: "text", text: `Discord：${discordId}`, color: "#DDDDDD", size: "xs" },
-                  { type: "text", text: `備註：${memo}`, color: "#999999", size: "xs", margin: "xs", wrap: true }
-                ]
-              }
-            ]
-          }
-        };
-
-        // 3. 發送訊息給 LINE
-        if (liff.isLoggedIn()) {
-          await liff.sendMessages([{
-            type: "flex",
-            altText: `【九霄劍閣】預約單 - ${companionName}`,
-            contents: flexData
-          }]);
-          
-          showToast("✅ 預約成功！");
-          setTimeout(() => { liff.closeWindow(); }, 1200);
-        } else {
-          liff.login();
-        }
-      } catch (error) {
-        alert("發送失敗！請確認是否在 LINE App 內開啟。");
-        window.location.href = LINE_OFFICIAL_URL;
-      } finally {
-        btn.innerHTML = '確認送出訂單';
-        btn.disabled = false;
-      }
+        fetch(GAS_API_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'addOrder', lineUid: uid, userName: uName, companionName: companionName, totalAmount: totalAmount }) }).catch(e => console.error("寫入資料庫失敗", e)); 
+        const flexData = { type: "bubble", header: { type: "box", layout: "vertical", backgroundColor: "#4F46E5", contents: [{ type: "text", text: "🎮 九霄劍閣 - 預約需求", color: "#FFFFFF", weight: "bold", size: "md" }] }, body: { type: "box", layout: "vertical", backgroundColor: "#111827", contents: [{ type: "text", text: `預約導師：${companionName}`, weight: "bold", size: "md", color: "#FFFFFF" }, { type: "text", text: `服務項目：${serviceName} x ${qty} ${unit}`, size: "xs", color: "#AAAAAA", margin: "md" }, { type: "text", text: `應付金額：NT$ ${totalAmount}`, size: "xl", color: "#818CF8", weight: "bold", margin: "md" }, { type: "separator", margin: "xl", color: "#333333" }, { type: "box", layout: "vertical", margin: "md", contents: [{ type: "text", text: `Discord：${discordId}`, color: "#DDDDDD", size: "xs" }, { type: "text", text: `備註：${memo}`, color: "#999999", size: "xs", margin: "xs", wrap: true }] }] } };
+        if (liff.isLoggedIn()) { await liff.sendMessages([{ type: "flex", altText: `【九霄劍閣】預約單 - ${companionName}`, contents: flexData }]); showToast("✅ 預約成功！"); setTimeout(() => { liff.closeWindow(); }, 1200); } else { liff.login(); }
+      } catch (error) { alert("發送失敗！請確認是否在 LINE App 內開啟。"); window.location.href = LINE_OFFICIAL_URL; } finally { btn.innerHTML = '確認送出訂單'; btn.disabled = false; }
     }
   </script>
 </body>
