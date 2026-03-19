@@ -38,9 +38,9 @@
         </div>
         <h1 class="text-xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">九霄劍閣</h1>
       </div>
-      <div class="flex items-center gap-2" id="userProfileBadge">
-        <span id="userNameDisplay" class="text-xs text-gray-400 font-medium">驗證中...</span>
-        <img id="userAvatarDisplay" src="" class="w-7 h-7 rounded-full bg-gray-700 border border-gray-600 hidden object-cover">
+      <div class="flex items-center gap-2 cursor-pointer active:scale-95 transition-transform bg-gray-800/50 px-2 py-1 rounded-full border border-gray-700" id="userProfileBadge" onclick="openMyProfile()">
+        <span id="userNameDisplay" class="text-xs text-gray-300 font-medium pl-1">驗證中...</span>
+        <img id="userAvatarDisplay" src="" class="w-7 h-7 rounded-full bg-gray-700 border border-gray-500 hidden object-cover shadow-sm">
       </div>
     </div>
 
@@ -119,6 +119,51 @@
     </div>
   </div>
 
+  <div id="myProfileView" class="w-full min-h-screen pb-24 hidden absolute top-0 left-0 bg-gray-900 z-[80]">
+    <div class="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md px-4 py-3 flex items-center border-b border-gray-800/50">
+      <button onclick="closeMyProfile()" class="relative z-50 flex items-center gap-2 text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95">
+        <i class="fa-solid fa-chevron-left"></i> 返回
+      </button>
+      <div class="absolute left-0 w-full text-center pointer-events-none">
+        <span class="text-md font-bold tracking-widest text-gray-200">個人中心</span>
+      </div>
+    </div>
+
+    <div class="px-5 mt-8 flex flex-col items-center">
+      <img id="myProfileAvatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="w-24 h-24 rounded-full object-cover border-4 border-gray-700 shadow-lg">
+      <h2 id="myProfileName" class="text-2xl font-bold mt-4 text-white">載入中...</h2>
+      <div class="mt-2 flex items-center gap-1.5 text-xs font-medium text-pink-400 bg-pink-900/30 px-3 py-1 rounded-full border border-pink-700/50">
+        <i class="fa-solid fa-crown"></i> 尊爵會員
+      </div>
+    </div>
+
+    <div class="px-5 mt-8">
+      <div class="bg-gradient-to-br from-gray-800 to-gray-800/50 p-6 rounded-2xl border border-gray-700 shadow-lg relative overflow-hidden">
+        <i class="fa-solid fa-coins absolute -right-4 -bottom-4 text-6xl text-gray-700/30"></i>
+        <h3 class="text-gray-400 text-sm font-medium mb-1">累積消費總額</h3>
+        <div class="flex items-end gap-2">
+          <span class="text-indigo-400 font-bold text-lg">NT$</span>
+          <span id="myTotalSpent" class="text-white text-4xl font-bold tracking-tight">0</span>
+        </div>
+        <div class="mt-4 w-full bg-gray-700 rounded-full h-1.5">
+          <div class="bg-gradient-to-r from-indigo-500 to-pink-500 h-1.5 rounded-full" style="width: 45%"></div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">再消費 NT$ 1,500 即可升級為「白金乾爹」</p>
+      </div>
+    </div>
+    
+    <div class="px-5 mt-6 space-y-3">
+      <button class="w-full bg-gray-800 border border-gray-700 p-4 rounded-xl flex justify-between items-center active:scale-[0.98] transition-all">
+        <div class="flex items-center gap-3 text-gray-200"><i class="fa-solid fa-list-ul text-indigo-400 w-5"></i> 歷史訂單</div>
+        <i class="fa-solid fa-chevron-right text-gray-500 text-sm"></i>
+      </button>
+      <button class="w-full bg-gray-800 border border-gray-700 p-4 rounded-xl flex justify-between items-center active:scale-[0.98] transition-all">
+        <div class="flex items-center gap-3 text-gray-200"><i class="fa-solid fa-headset text-pink-400 w-5"></i> 聯絡客服</div>
+        <i class="fa-solid fa-chevron-right text-gray-500 text-sm"></i>
+      </button>
+    </div>
+  </div>
+
   <div id="modalOverlay" class="fixed inset-0 bg-black/70 z-[60] hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm" onclick="closeModal()"></div>
   <div id="bookingSheet" class="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-700 rounded-t-3xl z-[70] transform translate-y-full transition-transform duration-300 ease-out p-6 pb-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
     <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mb-5"></div>
@@ -147,9 +192,7 @@
         <label class="block text-sm font-medium text-gray-400 mb-2">您的 Discord ID</label>
         <input type="text" id="discordId" placeholder="例如: User#1234" class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3.5">
       </div>
-      <div class="hidden">
-        <input type="text" id="promoCode" value="">
-      </div>
+      <div class="hidden"><input type="text" id="promoCode" value=""></div>
       <div>
         <label class="block text-sm font-medium text-gray-400 mb-2">備註 (選填)</label>
         <textarea id="memo" rows="2" placeholder="例如：我打野，求保排" class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3.5 resize-none"></textarea>
@@ -170,7 +213,7 @@
     const MY_LIFF_ID = "2009198027-4SP09i5g";
     const LINE_OFFICIAL_URL = "https://lin.ee/9XKIAym"; 
 
-    // 🌟 資料庫設定：增加了 gallery 陣列存放多圖
+    // 🌟 資料庫設定：包含了多圖 (gallery)
     const DATABASE = {
       banner: {
         image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -179,13 +222,9 @@
       },
       companions: [
         { 
-          id: "c01", 
-          name: "小雪", 
-          rating: "4.9", 
-          tags: "傳說對決,技術車隊,溫柔", 
+          id: "c01", name: "小雪", rating: "4.9", tags: "傳說對決,技術車隊,溫柔", 
           intro: "哈囉我是小雪！傳說常駐！下班缺隊友來找我玩～", 
           avatar: "https://images.unsplash.com/photo-1583513702439-2e611c58e93d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80", 
-          // 小雪有多張照片
           gallery: [
             "https://images.unsplash.com/photo-1583513702439-2e611c58e93d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1618077360395-f3068be8e001?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
@@ -193,26 +232,18 @@
           audio: "" 
         },
         { 
-          id: "c02", 
-          name: "夜神", 
-          rating: "5.0", 
-          tags: "特戰英豪,頂尖射手,上分", 
+          id: "c02", name: "夜神", rating: "5.0", tags: "特戰英豪,頂尖射手,上分", 
           intro: "各路皆通，保證上分，不C包退。", 
           avatar: "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80", 
-          // 夜神只有一張
           gallery: [
             "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
           ],
           audio: "" 
         },
         { 
-          id: "c03", 
-          name: "兔兔", 
-          rating: "4.8", 
-          tags: "語音聊天,唱歌", 
+          id: "c03", name: "兔兔", rating: "4.8", tags: "語音聊天,唱歌", 
           intro: "聲音甜美，可以唱歌給你聽喔～", 
           avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80", 
-          // 兔兔有多張照片
           gallery: [
             "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
@@ -226,6 +257,11 @@
         { companion_id: "c03", name: "語音聊天", desc: "純聊天解悶", price: 200, unit: "小時", icon: "fa-microphone", color: "pink" }
       ],
       reviews: []
+    };
+
+    // 🌟 新增：個人帳戶假資料 (未來可串接資料庫)
+    const MY_ACCOUNT_DATA = {
+      totalSpent: 3500 
     };
 
     let currentCompanionId = null; 
@@ -260,6 +296,33 @@
       }
     };
 
+    // 🌟 玩家個人中心功能
+    function openMyProfile() {
+      if (userProfile) {
+        document.getElementById('myProfileName').innerText = userProfile.displayName;
+        if (userProfile.pictureUrl) {
+          document.getElementById('myProfileAvatar').src = userProfile.pictureUrl;
+        }
+      }
+      document.getElementById('myTotalSpent').innerText = MY_ACCOUNT_DATA.totalSpent.toLocaleString();
+
+      const myProfileView = document.getElementById('myProfileView');
+      myProfileView.classList.remove('hidden');
+      myProfileView.classList.add('view-enter');
+      window.scrollTo(0, 0);
+    }
+
+    function closeMyProfile() {
+      const myProfileView = document.getElementById('myProfileView');
+      myProfileView.classList.remove('view-enter');
+      myProfileView.classList.add('view-leave');
+      setTimeout(() => {
+        myProfileView.classList.add('hidden');
+        myProfileView.classList.remove('view-leave');
+      }, 300);
+    }
+
+    // 分類過濾
     function filterCategory(category, clickedBtn) {
       const btns = document.querySelectorAll('.cat-btn');
       btns.forEach(btn => {
@@ -284,6 +347,7 @@
       }
     }
 
+    // 渲染導師列表
     function renderList(companions) {
       const grid = document.getElementById('companionsGrid');
       let html = '';
@@ -309,7 +373,7 @@
       grid.innerHTML = html;
     }
 
-    // 🌟 修改區塊：生成多張圖片的輪播 HTML
+    // 開啟導師主頁
     function openProfile(id) {
       currentCompanionId = id;
       const companion = DATABASE.companions.find(c => c.id === id);
@@ -322,10 +386,9 @@
       document.getElementById('profileIntro').innerText = companion.intro;
       document.getElementById('modalTargetName').innerText = `- ${companion.name}`;
 
-      // 處理輪播圖資料
+      // 渲染多圖輪播
       const galleryContainer = document.getElementById('profileGallery');
       let galleryHtml = '';
-      // 如果沒有 gallery 資料，就預設拿 avatar 陣列化
       const images = (companion.gallery && companion.gallery.length > 0) ? companion.gallery : [companion.avatar];
 
       images.forEach(imgUrl => {
@@ -368,7 +431,6 @@
       profile.classList.remove('hidden');
       profile.classList.add('view-enter');
       
-      // 確保每次開啟主頁時，輪播圖回到第一張
       galleryContainer.scrollTo(0, 0); 
       window.scrollTo(0, 0); 
     }
@@ -388,6 +450,7 @@
       }, 300);
     }
 
+    // 語音播放功能
     function togglePlay() {
       const icon = document.getElementById('playIcon'); 
       const text = document.getElementById('playText');
@@ -401,6 +464,7 @@
       if(icon && text) { icon.className = 'fa-solid fa-circle-play text-lg text-indigo-400'; text.innerText = '點擊試聽專屬語音'; text.className = 'font-bold text-sm text-indigo-200 tracking-wider'; }
     }
 
+    // 購物車與數量計算
     function calculateTotal() {
       const sel = document.getElementById('serviceSelect');
       if(!sel.options.length) return;
@@ -435,6 +499,7 @@
       setTimeout(() => { toast.classList.replace('opacity-100', 'opacity-0'); toast.classList.replace('translate-y-0', '-translate-y-5'); }, 3000);
     }
 
+    // 🌟 送出訂單 (LIFF Flex Message)
     async function submitOrder() {
       const discordId = document.getElementById('discordId').value;
       const memo = document.getElementById('memo').value || "無備註";
@@ -461,13 +526,7 @@
           layout: "vertical",
           backgroundColor: "#4F46E5",
           contents: [
-            {
-              type: "text",
-              text: "🎮 九霄劍閣 - 預約需求",
-              color: "#FFFFFF",
-              weight: "bold",
-              size: "md"
-            }
+            { type: "text", text: "🎮 九霄劍閣 - 預約需求", color: "#FFFFFF", weight: "bold", size: "md" }
           ]
         },
         body: {
@@ -475,52 +534,15 @@
           layout: "vertical",
           backgroundColor: "#111827",
           contents: [
+            { type: "text", text: `預約導師：${companionName}`, weight: "bold", size: "md", color: "#FFFFFF" },
+            { type: "text", text: `服務項目：${serviceName} x ${qty} ${unit}`, size: "xs", color: "#AAAAAA", margin: "md" },
+            { type: "text", text: `應付金額：NT$ ${total}`, size: "xl", color: "#818CF8", weight: "bold", margin: "md" },
+            { type: "separator", margin: "xl", color: "#333333" },
             {
-              type: "text",
-              text: `預約導師：${companionName}`,
-              weight: "bold",
-              size: "md",
-              color: "#FFFFFF"
-            },
-            {
-              type: "text",
-              text: `服務項目：${serviceName} x ${qty} ${unit}`,
-              size: "xs",
-              color: "#AAAAAA",
-              margin: "md"
-            },
-            {
-              type: "text",
-              text: `應付金額：NT$ ${total}`,
-              size: "xl",
-              color: "#818CF8",
-              weight: "bold",
-              margin: "md"
-            },
-            {
-              type: "separator",
-              margin: "xl",
-              color: "#333333"
-            },
-            {
-              type: "box",
-              layout: "vertical",
-              margin: "md",
+              type: "box", layout: "vertical", margin: "md",
               contents: [
-                {
-                  type: "text",
-                  text: `Discord：${discordId}`,
-                  color: "#DDDDDD",
-                  size: "xs"
-                },
-                {
-                  type: "text",
-                  text: `備註：${memo}`,
-                  color: "#999999",
-                  size: "xs",
-                  margin: "xs",
-                  wrap: true
-                }
+                { type: "text", text: `Discord：${discordId}`, color: "#DDDDDD", size: "xs" },
+                { type: "text", text: `備註：${memo}`, color: "#999999", size: "xs", margin: "xs", wrap: true }
               ]
             }
           ]
